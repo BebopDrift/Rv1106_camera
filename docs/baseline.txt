@@ -1,0 +1,32 @@
+Project: RV1106 GPIO-triggered inspection
+Hardware: Luckfox Pico Max + Waveshare SC3336
+
+[SDK]
+/home/qu/embedded_linux/luckfox/sdk
+Commit: 824b817f889c2cbff1d48fcdb18ab494a68f69d1
+## main...origin/main
+ M project/app/wifi_app/hostapd-2.6/hostapd/hostapd
+ M project/app/wifi_app/hostapd-2.6/hostapd/hostapd_cli
+ M project/app/wifi_app/wifi/librkwifibt.so
+ M project/cfg/BoardConfig_IPC/BoardConfig-SPI_NAND-Buildroot-RV1106_Luckfox_Pico_Pro_Max-IPC.mk
+ M sysdrv/source/kernel/arch/arm/boot/dts/rv1106g-luckfox-pico-pro-max.dts
+?? external_apps/
+?? external_modules/
+?? logs/
+?? project/cfg/BoardConfig_IPC/overlay/overlay-tcp-server/
+
+[Board]
+Linux luckfox 5.10.160 #22 Wed Jun 11 18:43:57 CST 2025 armv7l GNU/Linux
+NAME=Buildroot
+VERSION=-g2ae728b52-dirty
+ID=buildroot
+VERSION_ID=2023.02.6
+PRETTY_NAME="Buildroot 2023.02.6"
+dev:    size   erasesize  name
+mtd0: 00040000 00020000 "env"
+mtd1: 00040000 00020000 "idblock"
+mtd2: 00080000 00020000 "uboot"
+mtd3: 00400000 00020000 "boot"
+mtd4: 01e00000 00020000 "oem"
+mtd5: 00a00000 00020000 "userdata"
+mtd6: 0d200000 00020000 "rootfs"
