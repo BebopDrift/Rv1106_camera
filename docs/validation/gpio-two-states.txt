@@ -1,0 +1,2 @@
+expected=plug_inserted INSPECT gpio_seq=5 frame_seq=120 detections=0 state=unknown reason=no_detection
+expected=pins_exposed INSPECT gpio_seq=7 frame_seq=120 detections=0 state=unknown reason=no_detection
