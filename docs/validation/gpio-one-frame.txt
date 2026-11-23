@@ -1,0 +1,16 @@
+grep: capture.log: No such file or directory
+format=NV12 2304x1296 stride=2304 sizeimage=4478976
+CAPTURE_READY
+TRIGGER gpio_seq=1 gpio_ts_ns=1775521194262
+SAVED path=/tmp/gpio-shot.nv12 bytes=4478976
+MATCH gpio_seq=1 frame_seq=120 frame_ts_ns=1775535340000 delta_ns=14145738
+GPIO_V4L2_TEST_OK
+PREPROCESS rgb=640x640 content=640x360 pad_y=140 bytes=1228800
+model inputs=1 outputs=3
+output[0] logical=1x21x80x80 native=NC1HWC2 min=0.000000 max=0.986989
+output[1] logical=1x21x40x40 native=NC1HWC2 min=0.000000 max=0.931480
+output[2] logical=1x21x20x20 native=NC1HWC2 min=0.003568 max=0.863570
+DECODE scanned=25200 above=0 kept=0 score_min=0.25 nms_iou=0.45
+BEST_RAW class=0 score=0.05921301 xyxy=336.033295,-117.318253,380.729584,310.662048
+PASS native one-frame inference
+INSPECT gpio_seq=1 frame_seq=120 detections=0 state=unknown reason=no_detection

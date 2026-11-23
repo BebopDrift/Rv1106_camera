@@ -3,11 +3,13 @@
 set -euo pipefail
 here="$(cd -- "$(dirname -- "$0")" && pwd)"
 project="${CONNECTOR_PROJECT:-$(git -C "$here" rev-parse --show-toplevel 2>/dev/null || printf '%s' "$HOME/embedded_linux/luckfox/rv1106_inspection")}"
+gpio=0
 decode=0
 case "${1:-}" in
     "") ;;
     --decode) decode=1 ;;
-    *) echo "usage: bash $0 [--decode]" >&2; exit 2 ;;
+    --gpio) gpio=1 ;;
+    *) echo "usage: bash $0 [--decode | --gpio]" >&2; exit 2 ;;
 esac
 (( $# <= 1 )) || { echo "too many arguments" >&2; exit 2; }
 sdk="${LUCKFOX_SDK:-$HOME/embedded_linux/luckfox/sdk}"
@@ -32,7 +34,13 @@ if [[ ! -x "$cc" ]]; then
     cc="$(command -v "$cc_name" || true)"
 fi
 [[ -x "$cc" ]] || { echo "找不到 $cc_name，请把 CONNECTOR_CC 设为编译器的绝对路径。" >&2; exit 1; }
-for f in "$src" "$model" "$calibration" "$python"; do
+inputs=("$src" "$model")
+if (( gpio )); then
+    inputs+=("$project/src/gpio_v4l2_capture.c" "$export_dir/RK_anchors.txt")
+else
+    inputs+=("$calibration" "$python")
+fi
+for f in "${inputs[@]}"; do
     [[ -s "$f" ]] || { echo "缺少文件：$f" >&2; exit 1; }
 done
 adb get-state >/dev/null
@@ -51,14 +59,34 @@ if [[ ! -s "$header" ]] || ! check_header "$header"; then
     mv -- "$tmp_header" "$header"
     trap - EXIT
 fi
+if (( gpio )); then
+    work="$(mktemp -d "$work/gpio.XXXXXX")"
+    echo "本轮 Ubuntu 日志 $work/board.log"
+fi
 lib="${CONNECTOR_RKNN_LIB:-}"
 if [[ -z "$lib" ]]; then
     lib="$work/librknnmrt.so"
     adb pull /oem/usr/lib/librknnmrt.so "$lib"
 fi
-"$cc" -std=gnu11 -O2 -Wall -Wextra -I"$work" "$src" \
+"$cc" -std=gnu11 -O2 -Wall -Wextra -I"$(dirname -- "$header")" "$src" \
     "$here/connector_decode.c" "$lib" -lm -o "$work/connector_one_frame"
 file "$work/connector_one_frame"
+
+if (( gpio )); then
+    "$cc" -std=gnu11 -O2 -Wall -Wextra "$project/src/gpio_v4l2_capture.c" -o "$work/gpio_v4l2_capture"
+    "$cc" -std=gnu11 -O2 -Wall -Wextra "$here/nv12_to_rgb.c" -o "$work/nv12_to_rgb"
+    board="$(adb shell 'mktemp -d /tmp/connector-gpio.XXXXXX' | tr -d '\r')"
+    [[ "$board" =~ ^/tmp/connector-gpio\.[[:alnum:]]{6}$ ]] || { echo "invalid board work directory" >&2; exit 1; }
+    cleanup_board() { timeout 5 adb shell "rm -rf '$board'" >/dev/null 2>&1 || :; }
+    trap cleanup_board EXIT
+    adb push "$work/connector_one_frame" "$work/gpio_v4l2_capture" "$work/nv12_to_rgb" \
+        "$model" "$export_dir/RK_anchors.txt" "$here/gpio_one_shot.sh" "$here/inspection_result.awk" "$board/"
+    timeout 55 adb shell "cd '$board' && chmod 755 connector_one_frame gpio_v4l2_capture nv12_to_rgb && sh ./gpio_one_shot.sh" \
+        | tee "$work/board.log"
+    # Also check the marker for adb versions that omit the remote shell exit status.
+    grep -q '^INSPECT ' "$work/board.log" || { echo "未收到本轮 INSPECT，请看 $work/board.log" >&2; exit 1; }
+    exit 0
+fi
 
 # 读取上次校准清单中的第一张图片。缩放、居中、填灰边，输出 RGB 字节。
 env -u PYTHONPATH "$python" - "$calibration" "$work/frame.rgb" "$work/frame.json" <<'PY'

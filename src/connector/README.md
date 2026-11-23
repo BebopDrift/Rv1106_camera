@@ -33,3 +33,27 @@ build/connector/test_decode
 ```
 
 解码公式参考 [Rockchip YOLOv5 后处理](https://github.com/airockchip/rknn_model_zoo/blob/main/examples/yolov5/python/yolov5.py)。
+
+## 用 GPIO 触发一次现场检查
+
+在 Ubuntu 的项目根目录执行。把连接器放入 SC3336 画面，保留已验收的 GPIO 回环接线与相机驱动。脚本使用现有的 src/gpio_v4l2_capture.c，并沿用 /dev/hello-gpio-events、hello-platform 的 level 与 /dev/video11。若刚重启，先恢复原项目已验收的驱动和相机设备。采集期间由本次程序独占视频口和 GPIO 事件读取。
+
+```bash
+CONNECTOR_EXPORT_DIR="$PWD/connector_export.hDk3XV" bash src/connector/run_connector_native.sh --gpio
+```
+
+Ubuntu 交叉编译、传送程序与模型、保存日志。板上等待 CAPTURE_READY，预热 3 秒后拉高回环输出，抓取匹配上升沿的第一张合格帧。TRIGGER 与 MATCH 必须对应同一事件，采集必须报告 SAVED 和成功退出。新快照经原子替换产生后，脚本单独引用本轮文件，再送入预处理。结束时 GPIO 输出回到低电平。程序沿用运行中的 rkaiq_3A_server，独占采集环境中服务缺失时尝试临时启动它。
+
+nv12_to_rgb.c 读取项目已验收的紧凑 NV12 格式（2304×1296，4478976 字节）。按训练图片制作时使用的全范围转换约定，本实现显式取 BT.601 系数；采集日志中的编码字段为 Default。程序分别对亮度和交错的 UV 色度做双线性采样，生成 640×360 的 RGB 图像，上下各填 140 行灰色。板上完成推理与两类解码，整个过程使用当前帧，不需要校准图片或人工标签。DETECTION 的框坐标以 640×640 模型输入为基准。
+
+| 日志字段 | 验收依据 |
+|---|---|
+| TRIGGER、MATCH、SAVED | 同一 gpio_seq 对应本次 frame_seq，保存字节数正确 |
+| PREPROCESS、DECODE、PASS | 输入已转换，三个检测头共扫描 25200 个候选，原生推理完成 |
+| INSPECT | 汇总本次事件号、帧号、正式检测数与模型结果。无框为 unknown；两类同时出现为 unknown/conflicting_classes；同一类有框时输出该类。BEST_RAW 仅供排查。 |
+
+Ubuntu 完整日志路径由启动脚本打印，格式为 build/connector/gpio.XXXXXX/board.log。每次运行单独保存。板端 /tmp/gpio-shot.nv12 为最近一次抓拍。若想回看该帧，在下一次抓拍前将其拉回，按 2304×1296 NV12 读取。本模式验证触发、取帧和推理的联动；当前识别精度仍以人工标注对照为准。
+
+```bash
+python3 tests/test_gpio_inspection.py
+```
