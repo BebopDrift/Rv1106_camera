@@ -1,14 +1,31 @@
 #!/usr/bin/env bash
-# 在 Ubuntu 运行。把本脚本和 connector_one_frame.c 放在同一目录。
+# 在工程中执行。--decode 用同一张图运行框解码和标注对照。
 set -euo pipefail
-project="${CONNECTOR_PROJECT:-$HOME/embedded_linux/luckfox/rv1106_inspection}"
+here="$(cd -- "$(dirname -- "$0")" && pwd)"
+project="${CONNECTOR_PROJECT:-$(git -C "$here" rev-parse --show-toplevel 2>/dev/null || printf '%s' "$HOME/embedded_linux/luckfox/rv1106_inspection")}"
+decode=0
+case "${1:-}" in
+    "") ;;
+    --decode) decode=1 ;;
+    *) echo "usage: bash $0 [--decode]" >&2; exit 2 ;;
+esac
+(( $# <= 1 )) || { echo "too many arguments" >&2; exit 2; }
 sdk="${LUCKFOX_SDK:-$HOME/embedded_linux/luckfox/sdk}"
-export_dir="$project/connector_export.hDk3XV"
+export_dir="${CONNECTOR_EXPORT_DIR:-}"
+if [[ -z "$export_dir" ]]; then
+    shopt -s nullglob
+    models=("$project"/connector_export.*/connector_rv1106.rknn)
+    if (( ${#models[@]} != 1 )); then
+        echo "请将 CONNECTOR_EXPORT_DIR 设为本次模型与 RK_anchors.txt 所在目录。" >&2
+        exit 1
+    fi
+    export_dir="$(dirname -- "${models[0]}")"
+fi
 model="$export_dir/connector_rv1106.rknn"
 calibration="$export_dir/calibration.txt"
 python="$project/.venv-rknn/bin/python"
-src="$(cd -- "$(dirname -- "$0")" && pwd)/connector_one_frame.c"
-work="$project/native_connector"
+src="$here/connector_one_frame.c"
+work="$project/build/connector"
 cc_name=arm-rockchip830-linux-uclibcgnueabihf-gcc
 cc="${CONNECTOR_CC:-$sdk/tools/linux/toolchain/arm-rockchip830-linux-uclibcgnueabihf/bin/$cc_name}"
 if [[ ! -x "$cc" ]]; then
@@ -34,13 +51,19 @@ if [[ ! -s "$header" ]] || ! check_header "$header"; then
     mv -- "$tmp_header" "$header"
     trap - EXIT
 fi
-adb pull /oem/usr/lib/librknnmrt.so "$work/librknnmrt.so"
+lib="${CONNECTOR_RKNN_LIB:-}"
+if [[ -z "$lib" ]]; then
+    lib="$work/librknnmrt.so"
+    adb pull /oem/usr/lib/librknnmrt.so "$lib"
+fi
 "$cc" -std=gnu11 -O2 -Wall -Wextra -I"$work" "$src" \
-    -L"$work" -lrknnmrt -o "$work/connector_one_frame"
+    "$here/connector_decode.c" "$lib" -lm -o "$work/connector_one_frame"
 file "$work/connector_one_frame"
 
 # 读取上次校准清单中的第一张图片。缩放、居中、填灰边，输出 RGB 字节。
-env -u PYTHONPATH "$python" - "$calibration" "$work/frame.rgb" <<'PY'
+env -u PYTHONPATH "$python" - "$calibration" "$work/frame.rgb" "$work/frame.json" <<'PY'
+import json
+import os
 import sys
 from pathlib import Path
 import cv2
@@ -50,7 +73,7 @@ listing = Path(sys.argv[1])
 first = next((s.strip() for s in listing.read_text().splitlines() if s.strip()), "")
 if not first:
     raise SystemExit(f"空校准清单 {listing}")
-image_path = listing.parent / first
+image_path = Path(os.environ.get("CONNECTOR_IMAGE") or listing.parent / first).absolute()
 bgr = cv2.imread(str(image_path), cv2.IMREAD_COLOR)
 if bgr is None:
     raise SystemExit(f"无法读取 {image_path}")
@@ -62,6 +85,9 @@ rgb = np.full((640, 640, 3), 114, dtype=np.uint8)
 x, y = (640 - w) // 2, (640 - h) // 2
 rgb[y:y+h, x:x+w] = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
 rgb.tofile(sys.argv[2])
+meta = dict(image=str(image_path), width=width, height=height,
+            resized_width=w, resized_height=h, left=x, top=y)
+Path(sys.argv[3]).write_text(json.dumps(meta))
 print(f"输入图片 {image_path}\nRGB 输入 {rgb.nbytes} 字节")
 PY
 
@@ -69,4 +95,14 @@ PY
 board=/tmp/connector-native
 adb shell "mkdir -p $board"
 adb push "$work/connector_one_frame" "$model" "$work/frame.rgb" "$board/"
-adb shell "cd $board && chmod 755 connector_one_frame && LD_LIBRARY_PATH=/oem/usr/lib\${LD_LIBRARY_PATH:+:\$LD_LIBRARY_PATH} ./connector_one_frame connector_rv1106.rknn frame.rgb"
+board_args=""
+if (( decode )); then
+    adb push "$export_dir/RK_anchors.txt" "$board/RK_anchors.txt"
+    board_args="RK_anchors.txt"
+fi
+adb shell "cd $board && chmod 755 connector_one_frame && LD_LIBRARY_PATH=/oem/usr/lib\${LD_LIBRARY_PATH:+:\$LD_LIBRARY_PATH} ./connector_one_frame connector_rv1106.rknn frame.rgb $board_args" | tee "$work/board.log"
+if (( decode )); then
+    labels=()
+    if [[ -n "${CONNECTOR_LABEL:-}" ]]; then labels+=("$CONNECTOR_LABEL"); fi
+    env -u PYTHONPATH "$python" "$here/compare_frame.py" "$work/frame.json" "$work/board.log" "${labels[@]}"
+fi

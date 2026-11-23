@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "rknn_api.h"
+#include "connector_decode.h"
 
 enum { IMAGE_SIDE = 640, RGB_CHANNELS = 3, HEADS = 3, HEAD_CHANNELS = 21 };
 
@@ -77,7 +78,8 @@ static int check_head_shape(rknn_context ctx, unsigned i)
 }
 
 /* 打印全部有效通道的范围。NC1HWC2 的最后一组通道可能包含对齐填充。 */
-static int report_head(unsigned index, const rknn_tensor_attr *a, const rknn_tensor_mem *mem)
+static int report_head(unsigned index, const rknn_tensor_attr *a, const rknn_tensor_mem *mem,
+                       struct decoder *decoder)
 {
     const uint32_t side = 80u >> index;
     const uint32_t stride = a->w_stride ? a->w_stride : side;
@@ -121,13 +123,15 @@ static int report_head(unsigned index, const rknn_tensor_attr *a, const rknn_ten
     printf("output[%u] logical=1x%ux%ux%u native=%s min=%.6f max=%.6f\n",
            index, HEAD_CHANNELS, side, side, get_format_string(a->fmt),
            (low - a->zp) * a->scale, (high - a->zp) * a->scale);
+    if (decoder)
+        decode_head(decoder, index, data, side, stride, lanes, a->zp, a->scale);
     return 0;
 }
 
 int main(int argc, char **argv)
 {
-    if (argc != 3) {
-        fprintf(stderr, "usage: %s MODEL.rknn FRAME.rgb\n", argv[0]);
+    if (argc != 3 && argc != 4) {
+        fprintf(stderr, "usage: %s MODEL.rknn FRAME.rgb [RK_anchors.txt]\n", argv[0]);
         return EXIT_FAILURE;
     }
     rknn_context ctx = 0;
@@ -138,6 +142,15 @@ int main(int argc, char **argv)
     rknn_tensor_mem *input_mem = NULL, *outputs[HEADS] = {0};
     rknn_tensor_attr input = {0}, heads[HEADS] = {0};
     rknn_input_output_num count = {0};
+    struct decoder *decoder = NULL;
+    if (argc == 4) {
+        decoder = calloc(1, sizeof(*decoder));
+        if (!decoder) {
+            perror("allocate decoder");
+            goto done;
+        }
+        if (load_anchors(decoder, argv[3])) goto done;
+    }
     if (check_call("query I/O count", rknn_query(ctx, RKNN_QUERY_IN_OUT_NUM, &count, sizeof(count))))
         goto done;
     printf("model inputs=%u outputs=%u\n", count.n_input, count.n_output);
@@ -169,13 +182,15 @@ int main(int argc, char **argv)
     if (check_call("rknn_run", rknn_run(ctx, NULL)))
         goto done;
     for (unsigned i = 0; i < HEADS; ++i) {
-        if (report_head(i, &heads[i], outputs[i]))
+        if (report_head(i, &heads[i], outputs[i], decoder))
             goto done;
     }
+    if (decoder) print_boxes(decoder);
     puts("PASS native one-frame inference");
     result = EXIT_SUCCESS;
 
 done:
+    free(decoder);
     for (unsigned i = 0; i < HEADS; ++i)
         if (outputs[i]) rknn_destroy_mem(ctx, outputs[i]);
     if (input_mem) rknn_destroy_mem(ctx, input_mem);
