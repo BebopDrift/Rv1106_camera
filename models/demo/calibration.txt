@@ -1,0 +1,13 @@
+../../training/dataset/images/train/batch.ZSPG6n-aiq_missing_01.jpg
+../../training/dataset/images/train/batch.ZSPG6n-aiq_missing_02.jpg
+../../training/dataset/images/train/batch.ZSPG6n-aiq_missing_03.jpg
+../../training/dataset/images/train/batch.ZSPG6n-aiq_missing_04.jpg
+../../training/dataset/images/train/batch.ZSPG6n-aiq_missing_05.jpg
+../../training/dataset/images/train/batch.ZSPG6n-aiq_present_01.jpg
+../../training/dataset/images/train/batch.ZSPG6n-aiq_present_02.jpg
+../../training/dataset/images/train/batch.ZSPG6n-aiq_present_03.jpg
+../../training/dataset/images/train/batch.ZSPG6n-aiq_present_04.jpg
+../../training/dataset/images/train/batch.ZSPG6n-aiq_present_05.jpg
+../../training/dataset/images/train/view_0hmQVv.png
+../../training/dataset/images/train/pins_exposed_frame_02.png
+../../training/dataset/images/train/plug_inserted_frame_02.png

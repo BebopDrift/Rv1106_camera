@@ -1,0 +1,22 @@
+CONNECTOR_EXPORT_DIR=/home/qu/embedded_linux/luckfox/rv1106_inspection/models/demo
+/oem/usr/lib/librknnmrt.so: 1 file pulled, 0 skipped. 1.1 MB/s (223304 bytes in 0.198s)
+/home/qu/embedded_linux/luckfox/rv1106_inspection/build/connector/connector_one_frame: ELF 32-bit LSB executable, ARM, EABI5 version 1 (SYSV), dynamically linked, interpreter /lib/ld-uClibc.so.0, with debug_info, not stripped
+输入图片 /home/qu/embedded_linux/luckfox/rv1106_inspection/models/demo/../../training/dataset/images/train/batch.ZSPG6n-aiq_missing_01.jpg
+RGB 输入 1228800 字节
+/home/qu/embedded_linux/luckfox/rv1106_inspection/build/connector/connector_one_frame: 1 file pushed, 0 skipped. 148.0 MB/s (30776 bytes in 0.000s)
+/home/qu/embedded_linux/luckfox/rv1106_inspection/models/demo/connector_rv1106.rknn: 1 file pushed, 0 skipped. 1121.6 MB/s (2029497 bytes in 0.002s)
+/home/qu/embedded_linux/luckfox/rv1106_inspection/build/connector/frame.rgb: 1 file pushed, 0 skipped. 1.4 MB/s (1228800 bytes in 0.822s)
+3 files pushed, 0 skipped. 1.1 MB/s (3289073 bytes in 2.839s)
+/home/qu/embedded_linux/luckfox/rv1106_inspection/models/demo/RK_anchors.txt: 1 file pushed, 0 skipped. 0.4 MB/s (96 bytes in 0.000s)
+model inputs=1 outputs=3
+output[0] logical=1x21x80x80 native=NC1HWC2 min=0.000000 max=1.000000
+output[1] logical=1x21x40x40 native=NC1HWC2 min=0.000000 max=1.000000
+output[2] logical=1x21x20x20 native=NC1HWC2 min=0.000000 max=1.000000
+DECODE scanned=25200 above=22 kept=1 score_min=0.25 nms_iou=0.45
+BEST_RAW class=1 score=0.84373713 xyxy=252.506256,336.416138,276.152557,364.791687
+DETECTION class=1 score=0.84373713 xyxy=252.506256,336.416138,276.152557,364.791687
+PASS native one-frame inference
+GT image=batch.ZSPG6n-aiq_missing_01.jpg class=1(pins_exposed) xyxy=897.6,699.0,1029.0,824.9
+BEST_RAW_IMAGE class=1(pins_exposed) score=0.84373713 xyxy=909.0,707.1,994.1,809.3 iou=0.5259
+DETECTION_IMAGE class=1(pins_exposed) score=0.84373713 xyxy=909.0,707.1,994.1,809.3 iou=0.5259
+COMPARE detections=1 max_same_class_iou=0.5259 match=yes

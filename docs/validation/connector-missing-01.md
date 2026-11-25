@@ -19,5 +19,5 @@ COMPARE detections=0 max_same_class_iou=0.0000 match=no
 在 Ubuntu 工程根目录、使用同一导出目录及校准清单时，可按下列命令复查。
 
 ```bash
-CONNECTOR_EXPORT_DIR="$PWD/connector_export.hDk3XV" bash src/connector/run_connector_native.sh --decode
+bash src/connector/run_connector_native.sh --decode
 ```

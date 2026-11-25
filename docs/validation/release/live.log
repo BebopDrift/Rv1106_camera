@@ -1,0 +1,8 @@
+model inputs=1 outputs=3
+output[0] logical=1x21x80x80 native=NC1HWC2 min=0.000000 max=0.996078
+output[1] logical=1x21x40x40 native=NC1HWC2 min=0.000000 max=0.996078
+output[2] logical=1x21x20x20 native=NC1HWC2 min=0.000000 max=0.996078
+DECODE scanned=25200 above=4 kept=1 score_min=0.25 nms_iou=0.45
+BEST_RAW class=1 score=0.45702428 xyxy=215.499817,283.158020,271.339386,342.975342
+DETECTION class=1 score=0.45702428 xyxy=215.499817,283.158020,271.339386,342.975342
+PASS native one-frame inference

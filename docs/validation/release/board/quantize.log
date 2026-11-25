@@ -1,0 +1,47 @@
+I rknn-toolkit2 version: 2.3.2
+
+I Loading :   0%|                                                           | 0/121 [00:00<?, ?it/s]
+I Loading : 100%|██████████████████████████████████████████████| 121/121 [00:00<00:00, 55332.62it/s]
+
+I OpFusing 0:   0%|                                                         | 0/100 [00:00<?, ?it/s]
+I OpFusing 0: 100%|█████████████████████████████████████████████| 100/100 [00:00<00:00, 4545.88it/s]
+
+I OpFusing 1 :   0%|                                                        | 0/100 [00:00<?, ?it/s]
+I OpFusing 1 : 100%|████████████████████████████████████████████| 100/100 [00:00<00:00, 2468.44it/s]
+
+I OpFusing 2 :   0%|                                                        | 0/100 [00:00<?, ?it/s]
+I OpFusing 2 : 100%|████████████████████████████████████████████| 100/100 [00:00<00:00, 2272.10it/s]
+I OpFusing 2 : 100%|████████████████████████████████████████████| 100/100 [00:00<00:00, 2247.55it/s]
+[1;33mW[0m [1;33mbuild: found outlier value, this may affect quantization accuracy
+                        const name          abs_mean    abs_std     outlier value
+                        onnx::Conv_290      1.77        2.12        -30.780     [0m
+
+I GraphPreparing :   0%|                                                    | 0/149 [00:00<?, ?it/s]
+I GraphPreparing : 100%|████████████████████████████████████████| 149/149 [00:00<00:00, 6081.42it/s]
+
+I Quantizating :   0%|                                                      | 0/149 [00:00<?, ?it/s]
+I Quantizating :   1%|▎                                             | 1/149 [00:00<00:43,  3.40it/s]
+I Quantizating :   1%|▌                                             | 2/149 [00:00<00:31,  4.73it/s]
+I Quantizating :   3%|█▏                                            | 4/149 [00:00<00:19,  7.63it/s]
+I Quantizating :   7%|███                                          | 10/149 [00:00<00:07, 19.68it/s]
+I Quantizating :  11%|████▊                                        | 16/149 [00:00<00:04, 28.52it/s]
+I Quantizating :  15%|██████▉                                      | 23/149 [00:00<00:03, 38.82it/s]
+I Quantizating :  23%|██████████▎                                  | 34/149 [00:01<00:02, 57.11it/s]
+I Quantizating :  29%|████████████▉                                | 43/149 [00:01<00:01, 63.19it/s]
+I Quantizating :  40%|██████████████████                           | 60/149 [00:01<00:00, 91.06it/s]
+I Quantizating :  52%|███████████████████████                     | 78/149 [00:01<00:00, 115.13it/s]
+I Quantizating :  63%|███████████████████████████▊                | 94/149 [00:01<00:00, 126.37it/s]
+I Quantizating :  72%|███████████████████████████████▏           | 108/149 [00:01<00:00, 122.77it/s]
+I Quantizating :  81%|██████████████████████████████████▉        | 121/149 [00:01<00:00, 113.00it/s]
+I Quantizating :  92%|███████████████████████████████████████▌   | 137/149 [00:01<00:00, 119.30it/s]
+I Quantizating : 100%|████████████████████████████████████████████| 149/149 [00:01<00:00, 77.46it/s]
+[1;33mW[0m [1;33mbuild: The default input dtype of 'images' is changed from 'float32' to 'int8' in rknn model for performance!
+                       Please take care of this change when deploy rknn model with Runtime API![0m
+[1;33mW[0m [1;33mbuild: The default output dtype of 'output0' is changed from 'float32' to 'int8' in rknn model for performance!
+                      Please take care of this change when deploy rknn model with Runtime API![0m
+[1;33mW[0m [1;33mbuild: The default output dtype of '286' is changed from 'float32' to 'int8' in rknn model for performance!
+                      Please take care of this change when deploy rknn model with Runtime API![0m
+[1;33mW[0m [1;33mbuild: The default output dtype of '288' is changed from 'float32' to 'int8' in rknn model for performance!
+                      Please take care of this change when deploy rknn model with Runtime API![0m
+I rknn building ...
+I rknn building done.

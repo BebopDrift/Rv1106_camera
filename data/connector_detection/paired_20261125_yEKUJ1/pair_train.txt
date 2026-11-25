@@ -1,0 +1,2 @@
+images/train/pair01_plug_inserted.png
+images/train/pair01_repeat_pins_exposed.png

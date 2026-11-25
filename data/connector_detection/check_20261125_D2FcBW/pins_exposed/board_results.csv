@@ -1,0 +1,4 @@
+image,expected,kept,hit,extra,iou,conf,top_class,top_score
+frame_01.png,pins_exposed,1,0,1,0.0,0.0,0,0.37647063
+frame_02.png,pins_exposed,1,0,1,0.0,0.0,0,0.34901962
+frame_03.png,pins_exposed,1,0,1,0.0,0.0,0,0.33725491

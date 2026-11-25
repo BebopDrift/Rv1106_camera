@@ -1,0 +1,37 @@
+diff --git a/sysdrv/source/kernel/arch/arm/boot/dts/rv1106g-luckfox-pico-pro-max.dts b/sysdrv/source/kernel/arch/arm/boot/dts/rv1106g-luckfox-pico-pro-max.dts
+index 7c8a3e503..78ca57a73 100755
+--- a/sysdrv/source/kernel/arch/arm/boot/dts/rv1106g-luckfox-pico-pro-max.dts
++++ b/sysdrv/source/kernel/arch/arm/boot/dts/rv1106g-luckfox-pico-pro-max.dts
+@@ -8,8 +8,30 @@
+ #include "rv1106.dtsi"
+ #include "rv1106-evb.dtsi"
+ #include "rv1106-luckfox-pico-pro-max-ipc.dtsi"
++#include <dt-bindings/gpio/gpio.h>
++#include <dt-bindings/pinctrl/rockchip.h>
+ / {
+-	model = "Luckfox Pico Pro Max";
++	model = "Luckfox Pico Pro Max";
+-	compatible = "rockchip,rv1103g-38x38-ipc-v10", "rockchip,rv1106g3";
++	compatible = "rockchip,rv1103g-38x38-ipc-v10", "rockchip,rv1106g3";
++	hello-platform{
++		compatible = "qu,hello-platform";
++		qu,message = "hello from device tree";
++
++		pinctrl-names = "default";
++		pinctrl-0 = <&hello_platform_gpio_pins>;
++
++		output-gpios = <&gpio1 RK_PC7 GPIO_ACTIVE_HIGH>;
++		input-gpios = <&gpio1 RK_PC6 GPIO_ACTIVE_HIGH>;
++
++		status = "okay";
++	};
++};
++
++&pinctrl{
++	hello_platform{
++		hello_platform_gpio_pins: hello_platform_gpio_pins {
++			rockchip,pins = <1 RK_PC7 RK_FUNC_GPIO &pcfg_pull_none>, <1 RK_PC6 RK_FUNC_GPIO &pcfg_pull_down>;
++		};
++	};
+ };
+ /**********CRU**********/

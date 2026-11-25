@@ -15,14 +15,22 @@ esac
 sdk="${LUCKFOX_SDK:-$HOME/embedded_linux/luckfox/sdk}"
 export_dir="${CONNECTOR_EXPORT_DIR:-}"
 if [[ -z "$export_dir" ]]; then
-    shopt -s nullglob
-    models=("$project"/connector_export.*/connector_rv1106.rknn)
-    if (( ${#models[@]} != 1 )); then
-        echo "请将 CONNECTOR_EXPORT_DIR 设为本次模型与 RK_anchors.txt 所在目录。" >&2
-        exit 1
+    # Prefer the checked-in release candidate; keep the old export layout as a fallback.
+    if [[ -s "$project/models/demo/connector_rv1106.rknn" ]]; then
+        export_dir="$project/models/demo"
+    else
+        shopt -s nullglob
+        models=("$project"/connector_export.*/connector_rv1106.rknn)
+        if (( ${#models[@]} != 1 )); then
+            echo "models/demo model not found and connector_export.* did not resolve to exactly one model; set CONNECTOR_EXPORT_DIR." >&2
+            exit 1
+        fi
+        export_dir="$(dirname -- "${models[0]}")"
     fi
-    export_dir="$(dirname -- "${models[0]}")"
 fi
+[[ -d "$export_dir" ]] || { echo "Model directory does not exist: $export_dir" >&2; exit 1; }
+export_dir="$(cd -- "$export_dir" && pwd)"
+echo "CONNECTOR_EXPORT_DIR=$export_dir"
 model="$export_dir/connector_rv1106.rknn"
 calibration="$export_dir/calibration.txt"
 python="$project/.venv-rknn/bin/python"

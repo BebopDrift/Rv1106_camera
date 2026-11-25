@@ -1,0 +1,22 @@
+[34m[1mexport: [0mdata=../../../../yolov5-rockchip/data/coco128.yaml, weights=['/home/qu/embedded_linux/luckfox/rv1106_inspection/runs/train/fit_bg.axNLSAOt/rv1106_test/connector.pt'], imgsz=[640], batch_size=1, device=cpu, half=False, inplace=False, keras=False, optimize=False, int8=False, dynamic=False, simplify=False, opset=12, verbose=False, workspace=4, nms=False, agnostic_nms=False, topk_per_class=100, topk_all=100, iou_thres=0.45, conf_thres=0.25, include=['onnx'], rknpu=True
+YOLOv5 🚀 d25a0753 Python-3.12.3 torch-2.5.1+cpu CPU
+
+/home/qu/embedded_linux/luckfox/rv1106_inspection/yolov5-rockchip/models/experimental.py:80: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  ckpt = torch.load(attempt_download(w), map_location='cpu')  # load
+Fusing layers...
+Model summary: 213 layers, 1761871 parameters, 0 gradients, 4.1 GFLOPs
+---> save anchors for RKNN
+[[10.0, 13.0], [16.0, 30.0], [33.0, 23.0], [30.0, 61.0], [62.0, 45.0], [59.0, 119.0], [116.0, 90.0], [156.0, 198.0], [373.0, 326.0]]
+export detect model for RKNPU
+
+[34m[1mPyTorch:[0m starting from /home/qu/embedded_linux/luckfox/rv1106_inspection/runs/train/fit_bg.axNLSAOt/rv1106_test/connector.pt with output shape (1, 21, 80, 80) (3.7 MB)
+
+[34m[1mONNX:[0m starting export with onnx 1.16.2...
+[34m[1mONNX:[0m export success ✅ 0.3s, saved as /home/qu/embedded_linux/luckfox/rv1106_inspection/runs/train/fit_bg.axNLSAOt/rv1106_test/connector.onnx (6.8 MB)
+
+Export complete (0.6s)
+Results saved to [1m/home/qu/embedded_linux/luckfox/rv1106_inspection/runs/train/fit_bg.axNLSAOt/rv1106_test[0m
+Detect:          python detect.py --weights /home/qu/embedded_linux/luckfox/rv1106_inspection/runs/train/fit_bg.axNLSAOt/rv1106_test/connector.onnx
+Validate:        python val.py --weights /home/qu/embedded_linux/luckfox/rv1106_inspection/runs/train/fit_bg.axNLSAOt/rv1106_test/connector.onnx
+PyTorch Hub:     model = torch.hub.load('ultralytics/yolov5', 'custom', '/home/qu/embedded_linux/luckfox/rv1106_inspection/runs/train/fit_bg.axNLSAOt/rv1106_test/connector.onnx')
+Visualize:       https://netron.app

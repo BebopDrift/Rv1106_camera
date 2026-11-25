@@ -1,0 +1,4 @@
+image,expected,kept,hit,extra,iou,conf,top_class,top_score
+frame_01.png,plug_inserted,0,0,0,0.0,0.0,0,0.17254902
+frame_02.png,plug_inserted,0,0,0,0.0,0.0,0,0.15686275
+frame_03.png,plug_inserted,0,0,0,0.0,0.0,0,0.20000002

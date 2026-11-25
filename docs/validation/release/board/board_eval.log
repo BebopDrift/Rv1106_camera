@@ -1,0 +1,22 @@
+new_train 2 / 2 extra 0
+  pins_exposed_frame_02.png 0.8196 0.8374
+  plug_inserted_frame_02.png 0.8471 0.8684
+same_burst 3 / 3 extra 0
+  pins_exposed_frame_03.png 0.8196 0.8264
+  plug_inserted_frame_01.png 0.851 0.876
+  plug_inserted_frame_03.png 0.8392 0.8752
+refocus 1 / 2 extra 0
+  pins_exposed.png 0.0 0.0
+  plug_inserted.png 0.3398 0.7887
+old_val 5 / 6 extra 6
+pair_train 2 / 2 extra 0
+  pair01_plug_inserted.png 0.6588 0.8264
+  pair01_repeat_pins_exposed.png 0.6055 0.7754
+hold_plug_inserted 3 / 3 extra 3
+  frame_01.png 0.3098 0.5929
+  frame_02.png 0.2863 0.589
+  frame_03.png 0.2863 0.6113
+hold_pins_exposed 3 / 3 extra 3
+  frame_01.png 0.5077 0.7205
+  frame_02.png 0.4418 0.7075
+  frame_03.png 0.4844 0.714

@@ -1,0 +1,10 @@
+scene,frame,fit15_detections,release_detections,release_inserted,release_exposed
+background_initial,frame_01.png,1,0,0,0
+background_initial,frame_02.png,1,0,0,0
+background_initial,frame_03.png,1,0,0,0
+background_moved,frame_01.png,0,0,0,0
+background_moved,frame_02.png,0,0,0,0
+background_moved,frame_03.png,0,0,0,0
+previous_exposed,frame_01.png,0,1,0,1
+previous_exposed,frame_02.png,0,1,0,1
+previous_exposed,frame_03.png,0,0,0,0

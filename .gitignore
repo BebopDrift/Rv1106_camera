@@ -1,3 +1,12 @@
 /build/
 /captures/
 /artifacts/
+/.venv-rknn/
+/yolov5-rockchip/
+__pycache__/
+*.pyc
+*.cache
+/runs/
+/connector_export.*/
+/native_connector/
+/rknn-runtime-2.3.2.*/
